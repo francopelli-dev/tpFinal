@@ -1,8 +1,15 @@
 package com.tpFinal.tienda.models.entities;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "usuario")
 public class Usuario extends EntidadPersistente {
-    private String nombre;
-    private Carrito carrito;
+    @Column(name= "usuario")
+    private String usuario;
+    @Column(name = "pwr")
+    private String pwr;
+
 
 
 
