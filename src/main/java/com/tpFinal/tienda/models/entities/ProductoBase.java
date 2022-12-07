@@ -20,5 +20,7 @@ public class ProductoBase extends EntidadPersistente {
     private String descripcion;
     @Column(name = "tiempo_fabricacion")
     private String tiempoFabricacion;
+    @Column(name = "img")
+    private String url;
 
 }

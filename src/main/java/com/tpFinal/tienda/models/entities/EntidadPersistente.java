@@ -11,5 +11,5 @@ public abstract class EntidadPersistente {
     @Id
     @GeneratedValue
     @Getter
-    private Integer id;
+    private int id;
 }
