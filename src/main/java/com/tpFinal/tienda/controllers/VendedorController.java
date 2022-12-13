@@ -1,31 +1,63 @@
 package com.tpFinal.tienda.controllers;
 
-import com.tpFinal.tienda.dao.Dao;
-import com.tpFinal.tienda.models.entities.EntidadPersistente;
-import com.tpFinal.tienda.models.entities.Vendedor;
+import com.tpFinal.tienda.models.entities.*;
+import com.tpFinal.tienda.repository.PersonalizacionRepository;
+import com.tpFinal.tienda.repository.ProductoBRepository;
+import com.tpFinal.tienda.repository.ProductoFRepository;
+import com.tpFinal.tienda.repository.VendedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 public class VendedorController {
-    @Qualifier("vendedorImp")
     @Autowired
-    Dao dao;
+    VendedorRepository repo;
+    @Autowired
+    ProductoFRepository repoProd;
+    @Autowired
+    PersonalizacionRepository persoRepo;
+    @Autowired
+    ProductoBRepository prodBRepo;
 
-    @RequestMapping(value = "/api/vendedores",method = RequestMethod.GET)
-    public List<EntidadPersistente> getVendedores() {
-        return dao.getAll();
+    @PostMapping(value="/vendedores/{id}/productos")
+    public @ResponseBody ResponseEntity<ProductoFinal> addProducto(@PathVariable Long id, @RequestBody ProdAux prod){
+       if(repo.existsById(id)) {
+           ProductoFinal prodFin = new ProductoFinal();
+           Personalizacion perso = null;
+           if (persoRepo.existsById(prod.getPersoId())) {
+               perso = persoRepo.findById(prod.getPersoId()).get();
+           }
+           ProductoBase prodBase = null;
+           if (prodBRepo.existsById(prod.getProdBaseId())) {
+               prodBase = prodBRepo.findById(prod.getProdBaseId()).get();
+           }
+           prodFin.setPersonalizacion(perso);
+           prodFin.setProductoBase(prodBase);
+           prodFin.setVendedor(repo.findById(id).get());
+           prodFin.setUrl(prod.getUrl());
+           prodFin.setPrecioFinal(prodBase.getPrecioBase()+perso.getPrecio());
+           prodFin.setTextoAgregado(prod.getTextoAgregado());
+
+           prodFin.setActivo(true);
+           repoProd.save(prodFin);
+           return new ResponseEntity<>(prodFin,HttpStatus.OK);
+
+       } else {
+           return ResponseEntity.notFound().build();
+       }
     }
 
-    @RequestMapping(value= "/api/vendedores",method = RequestMethod.POST)
-    public void addVendedor(@RequestBody Vendedor vendedor){
-        dao.add(vendedor);
+    @GetMapping(value="/vendedores/{id}/productos")
+    public Collection<ProductoFinal> getAllProductos(@PathVariable Long id) {
+        return repo.findById(id).get().getProductos();
     }
-    @RequestMapping(value= "/api/vendedores/{id}",method = RequestMethod.DELETE)
-    public void delete(@PathVariable Integer id) {
-        dao.delete(id);
-    }
+    
+
+
+
+
 }

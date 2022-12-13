@@ -15,7 +15,7 @@ public class ProductoBase extends EntidadPersistente {
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "precio_base")
-    private String precioBase;
+    private Double precioBase;
     @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "tiempo_fabricacion")
@@ -23,4 +23,16 @@ public class ProductoBase extends EntidadPersistente {
     @Column(name = "img")
     private String url;
 
+    public ProductoBase() {
+    }
+    public Long getResourceId(){
+        return getId();
+    }
+    public ProductoBase(String nombre, Double precioBase, String descripcion, String tiempoFabricacion, String url) {
+        this.nombre = nombre;
+        this.precioBase = precioBase;
+        this.descripcion = descripcion;
+        this.tiempoFabricacion = tiempoFabricacion;
+        this.url = url;
+    }
 }

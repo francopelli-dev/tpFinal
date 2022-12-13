@@ -1,34 +1,75 @@
 package com.tpFinal.tienda.controllers;
 
 
-import com.tpFinal.tienda.dao.Dao;
-import com.tpFinal.tienda.models.entities.EntidadPersistente;
+import com.tpFinal.tienda.models.entities.Carrito;
 import com.tpFinal.tienda.models.entities.Usuario;
+import com.tpFinal.tienda.repository.CarritoRepo;
+import com.tpFinal.tienda.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.transaction.Transactional;
 
 @RestController
 public class UsuarioController {
-    @Qualifier("usuarioImp")
     @Autowired
-    Dao dao;
+    UsuarioRepository repo;
+    @Autowired
+    CarritoRepo carrRepo;
 
-    @RequestMapping(value = "/api/usuarios",method = RequestMethod.GET)
-    public List<EntidadPersistente> getUsuarios() {
-        return dao.getAll();
-    }
+   /* @GetMapping(value="/usuarios/{id}")
+    public @ResponseBody ResponseEntity<Usuario> getUsuario(@PathVariable Long id) {
+        if(repo.existsById(id)){
+            Usuario usuario = repo.findById(id).get();
 
-    @RequestMapping(value = "/api/usuarios",method = RequestMethod.POST)
-    public Usuario addUsuario(@RequestBody  Usuario usuario) {
-        dao.add(usuario);
+            return new ResponseEntity<>(usuario,HttpStatus.OK);
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
+    }*/
+    @Transactional
+    @DeleteMapping(value="/usuarios/{id}/delete")
+    public Usuario deleteUsuario(@PathVariable(value = "id") Long id){
+        if(repo.existsById(id)) {
+
+        Usuario usuario = repo.findById(id).get();
+        repo.deleteById(id);
         return usuario;
+        } else {
+            return new Usuario();
+        }
+
     }
-    @RequestMapping(value = "/api/usuarios/{id}",method = RequestMethod.DELETE)
-    public void delUsuario(@PathVariable Integer id) {
-        dao.delete(id);
+
+
+
+    @Transactional
+    @DeleteMapping(value="/usuarios/{id}/compras/{idCarr}")
+    public @ResponseBody ResponseEntity<Carrito> deleteCarrito(@PathVariable(value = "id") Long id,@PathVariable(value="idCarr") Long idCarr){
+        if(repo.existsById(id)) {
+            if(carrRepo.existsById(idCarr)) {
+                Carrito carr = carrRepo.findById(idCarr).get();
+                carrRepo.deleteById(idCarr);
+                return new ResponseEntity<>(carr, HttpStatus.OK);
+            }else {return ResponseEntity.notFound().build();
+
+            }
+
+        }
+        else {
+
+        return ResponseEntity.notFound().build();
+        }
+
     }
+
+
+
+
+
 
 }

@@ -15,5 +15,9 @@ public class Personalizacion extends EntidadPersistente {
     @Column(name="tipo")
     private String tipo;
     @Column(name ="precio")
-    private String precio;
+    private Double precio;
+
+    public Long getResourceId(){
+        return getId();
+    }
 }
